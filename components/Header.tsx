@@ -21,8 +21,8 @@ const Header = () => {
             {/* <Logo /> */}
             <Image
               src="/static/images/aymeric.png" // Path starting from the public directory
-              width={40}      // Required for static path strings
-              height={40}     // Required for static path strings
+              width={40} // Required for static path strings
+              height={40} // Required for static path strings
               alt="Acme Company Logo"
               priority
             />

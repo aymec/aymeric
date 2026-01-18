@@ -25,6 +25,7 @@ Edit the layout in `app` or content in `data`. With live reloading, the pages au
 A [`pages.yml`](.github/workflows/pages.yml) workflow is already provided. Simply select "GitHub Actions" in: `Settings > Pages > Build and deployment > Source`.
 
 ## Credits
+
 [Tailwind Nextjs Starter Blog](https://github.com/timlrx/tailwind-nextjs-starter-blog)
 
 ## License

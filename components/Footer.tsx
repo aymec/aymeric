@@ -24,7 +24,12 @@ export default function Footer() {
           <div>{siteMetadata.author}</div>
           <div>{` • `}</div>
           <Link href="/">{siteMetadata.title}</Link>
-          <div>licensed under the <Link href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1">CC BY 4.0</Link></div>
+          <div>
+            licensed under the{' '}
+            <Link href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1">
+              CC BY 4.0
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

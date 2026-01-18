@@ -145,10 +145,10 @@ export default function ListLayoutWithTags({
                       <div className="space-y-3">
                         <div>
                           <h2 className="text-2xl leading-8 font-bold tracking-tight">
-                            <Link 
-                              href={linkHref} 
-                              className="text-gray-900 dark:text-gray-100 flex items-center gap-2"
-                              {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
+                            <Link
+                              href={linkHref}
+                              className="flex items-center gap-2 text-gray-900 dark:text-gray-100"
+                              {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
                             >
                               {title}
                               {isExternal && (
