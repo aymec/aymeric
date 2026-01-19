@@ -1,6 +1,5 @@
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
-import Logo from '@/data/logo.png'
 import Image from 'next/image'
 import Link from './Link'
 import MobileNav from './MobileNav'
@@ -20,10 +19,10 @@ const Header = () => {
           <div className="mr-3">
             {/* <Logo /> */}
             <Image
-              src="/static/images/aymeric.png" // Path starting from the public directory
+              src={siteMetadata.siteLogo} // Path starting from the public directory
               width={40} // Required for static path strings
               height={40} // Required for static path strings
-              alt="Acme Company Logo"
+              alt={siteMetadata.title + ' Logo'}
               priority
             />
           </div>
