@@ -13,7 +13,7 @@ export default function Projects() {
             Projects
           </h1>
         </div>
-        <div className="container py-12">
+        <div className="container pt-8">
           <div className="-m-4 flex flex-wrap">
             {projectsData.map((d) => (
               <Card

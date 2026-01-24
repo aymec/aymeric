@@ -20,9 +20,7 @@ export default function AboutExcerpt() {
               className="h-48 w-48 rounded-full"
             />
           )}
-          <h3 className="pt-4 pb-2 text-2xl leading-8 font-bold tracking-tight">{name}</h3>
-          <div className="text-gray-500 dark:text-gray-400">{occupation}</div>
-          <div className="text-gray-500 dark:text-gray-400">{company}</div>
+          <h2 className="pt-4 pb-2 text-2xl leading-8 font-bold tracking-tight">{name}</h2>
         </div>
         <div className="prose dark:prose-invert max-w-none pt-8 pb-8 xl:col-span-2">
           <MDXLayoutRenderer code={author.body.code} />
