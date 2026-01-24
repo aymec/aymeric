@@ -9,8 +9,8 @@ const siteMetadata = {
   theme: 'system', // system, dark or light
   siteUrl: 'https://aymeric.fyi',
   siteRepo: 'https://github.com/aymec/aymeric',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/aymeric_512x512.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/aymeric.png`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/aymeric_512x512.webp`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/aymeric.webp`,
   mastodon: '',
   email: '',
   github: 'https://github.com/aymec',
