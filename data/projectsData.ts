@@ -9,7 +9,7 @@ const projectsData: Project[] = [
   {
     title: 'OnTrack - Habit Tracker',
     description: `Build lasting habits effortlessly! Track anything and everything with total customization. The simplest way to stay consistent and reach your goals.`,
-    imgSrc: '/static/images/ontrack_feature_graphic.png',
+    imgSrc: '/static/images/ontrack_android_banner.png',
     href: 'https://github.com/aymec/habit-tracker',
   },
   {
