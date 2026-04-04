@@ -6,6 +6,7 @@ import { remark } from 'remark'
 import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeStringify from 'rehype-stringify'
+import rehypeRaw from 'rehype-raw'
 import siteMetadata from '../data/siteMetadata.js'
 import tagData from '../app/tag-data.json' with { type: 'json' }
 import { allBlogs } from '../.contentlayer/generated/index.mjs'
@@ -16,10 +17,25 @@ const outputFolder = process.env.EXPORT ? 'out' : 'public'
 async function markdownToHtml(markdown, siteUrl) {
   const result = await remark()
     .use(remarkGfm)
-    .use(remarkRehype)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
     .use(rehypeStringify)
     .process(markdown)
-  return String(result).replace(/(<img\s[^>]*src=")([^"]*)(")/g, `$1${siteUrl}$2`)
+
+  let html = String(result)
+
+  // 1. Convert className to class (optional but cleaner for RSS)
+  html = html.replace(/className=/g, 'class=')
+
+  // 2. Fix the Image URLs
+  return html.replace(/(<img\s[^>]*src=")([^"]*)(")/g, (match, p1, p2, p3) => {
+    if (p2.startsWith('http')) return match
+
+    const baseUrl = siteUrl.endsWith('/') ? siteUrl.slice(0, -1) : siteUrl
+    const path = p2.startsWith('/') ? p2 : `/${p2}`
+
+    return `${p1}${baseUrl}${path}${p3}`
+  })
 }
 
 const generateRssItem = (config, post, html) => `
@@ -29,7 +45,7 @@ const generateRssItem = (config, post, html) => `
     <link>${config.siteUrl}/blog/${post.slug}</link>
     ${post.summary && `<description>${escape(post.summary)}</description>`}
     <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-    <author>${config.email} (${config.author})</author>
+    <author>${config.email} ${config.author}</author>
     ${post.tags && post.tags.map((t) => `<category>${t}</category>`).join('')}
     ${html ? `<content:encoded><![CDATA[${html}]]></content:encoded>` : ''}
   </item>
