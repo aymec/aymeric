@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Aymeric | Engineering Management & Technology',
+  title: 'Aymeric on Engineering Management & Technology',
   author: 'Aymeric Chalochet',
   headerTitle: 'Aymeric FYI',
   description:
