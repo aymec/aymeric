@@ -1,0 +1,13 @@
+I have an habit tracker app.
+For each goal, I have a counter, a target (optional) and buttons to increase the counter by a given amount.
+I tracker the history in a history screen stored in local storage.
+Now I want to add an analytics feature to the app.
+It should be in a new screen accessible from a button on the goal screen.
+Analytics should all to track the data over time or over options.
+When tracking over time, it should be possible to choose the period (this week, past 7d, this month, past 30d, this year, the last 365 days). It should be possible to show the analytics aggregated per day, per week, per month.
+Most goals require to be tracked over time, but in some cases, we want to look at the stats per option, such as the fruits and vegetables, where each options is a fruit or vegetable that increases the counter by one, so instead of displayed data over time, it should be displayed per option.
+User should be able to pick either lines or bar charts. For lines, they can pick whether to show a points or not.
+Finally, they should be able to see averages per day, week, month and year.
+The entire screen should feel easy to use.
+
+

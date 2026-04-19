@@ -1,0 +1,169 @@
+---
+title: 'Hands-on With Claude Design'
+date: '2026-04-19'
+tags: ['AI', 'Mobile Development', 'Design', 'Software Engineering']
+draft: false
+summary: Anthropic just launched Claude Design, a new research-preview product for generating interactive prototypes, slide decks, and more. I took it for a spin by designing a new analytics screen for my habit tracker app OnTrack, then handed the result off to Claude Code. Here's how it went.
+images: ['/static/images/claude_design/providing_multiple_options.png']
+---
+
+![Claude Design prototype result for OnTrack](/static/images/claude_design/providing_multiple_options.png)
+
+# Designing a New Screen for OnTrack with Claude Design
+
+A few weeks ago I wrote about [building OnTrack with Claude Code](/blog/building-ontrack), my cross-platform habit tracker built with React Native and Expo. Since shipping the first version, I've been adding features incrementally. The next one on my list was an analytics screen. This was an opportunity to try Anthropic's newly released [Claude Design](https://www.anthropic.com/news/claude-design-anthropic-labs).
+
+Claude Design came out of Anthropic Labs as a research preview for paid Claude subscribers. It lets you describe what you want and get back an interactive visual artifact you can refine through conversation. It supports a few project types out of the box: Prototype, Slide Deck, Template, and a generic "Other" bucket.
+
+My goal for this experiment was simple: use Claude Design to produce a design for a new analytics screen, then hand it off to Claude Code and see how much friction remained between the two.
+
+## The Prompt and the Inputs
+
+I started a Prototype project and gave Claude Design three things:
+* A screenshot of OnTrack's existing goal screen, so it could pick up the visual language.
+* A screenshot of the history screen, for the same reason.
+* A written prompt describing what I wanted the analytics screen to do.
+
+The prompt laid out the requirements in plain English: a new screen accessible from the goal screen, with two modes (over time vs. by option), selectable time periods, grouping by day/week/month, a toggle between line and bar charts, an option to show or hide points on line charts, and a panel of per-day/week/month/year averages.
+
+<div className="mx-auto flex w-full max-w-[350px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/ontrack_goal_screen.png" 
+      alt="OnTrack goal screen used as a design reference" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+## First Impressions: It's Fast
+
+Claude Design didn't ask a single clarifying question. It went straight to building. Within a minute or two, I had a working prototype on the canvas.
+
+I was surprised by this. When I tested the Slide Deck project type separately, Claude offered me several visual directions to pick from before committing. For the Prototype flow, it shipped a single direction. That's faster, but I missed the multi-options that I was expecting. It could also be due to how I prompted it, and the fact that I passed screenshots of my app, and it output a design consistent with the app's design.
+
+The first output itself was good. The layout was clean, the controls were organised sensibly, and it matched OnTrack's existing dark aesthetic without me having to spell it out.
+
+It produced an output faster than what Claude Code would usually do. Later on when I requested multiple options, it became evident that this new feature will speed up UI prototyping.
+
+### Asking for Alternatives
+
+Out of curiosity, I followed up and asked Claude to propose multiple options. Rather than jumping straight into generating variants, it opened a short questionnaire in a dedicated "Questions" panel to focus the exploration.
+
+<div className="mx-auto flex w-full max-w-[700px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/asking_for_multiple_options.png" 
+      alt="Claude Design's Questions panel: how many options, what to explore, how adventurous, how to present, should the current design be included" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+The questionnaire was well-scoped: how many options (3/4/5/decide for me), what dimensions the options should explore (layout density, chart style, control patterns, visual mood, hierarchy, interaction model), how adventurous to be ("stay close to current iOS patterns" to "go bold — surprise me"), how to present the options (side-by-side canvas vs. tweaks on the same prototype), and whether the current design should be one of the options. It's a nice pattern — instead of me having to describe what "different" should mean, Claude Design asked me to pick the axes of variation.
+
+### Three Directions, Side by Side
+
+Once I filled in the form, Claude Design produced three distinct design directions and laid them out on a single canvas so I could compare at a glance.
+
+<div className="mx-auto flex w-full max-w-[700px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/providing_multiple_options.png" 
+      alt="Three analytics screen directions side by side: iOS clean (current), Looker Studio data-dense, and a bold KPI dashboard" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+The three directions were meaningfully different: Option A kept the clean iOS look of the first prototype, Option B took a Looker-Studio-inspired data-dense approach with a dropdown filter bar and a KPI strip, and Option C went bolder with a dark-navy KPI dashboard, vivid accents, a hero tile with sparkline and delta, and a donut for active days. Options B and C followed instructions I had provided in the questionaire.
+
+Each phone on the canvas was individually interactive — I could scroll inside each one and tap the controls — which made comparing them far more useful than comparing three screenshots.
+
+This is where Claude Design starts to feel genuinely fast for iteration. Going from prompt → single prototype → "actually, show me other directions" → three interactive prototypes on a canvas took just a handful of messages.
+
+## The Prototype Is Actually Interactive
+
+This is the part I didn't expect and ended up enjoying the most. The generated prototype is not a static mockup. I could navgiate from the goal screen to the analytics screen, I could tap the various options and toggles, and the graph updated accordingly.
+
+For a screen where the whole point is how the data *feels* as you interact with it, being able to click around was much more useful than a flat PNG. It can let you catch usability issues immediately.
+
+<div className="mx-auto flex w-full max-w-[700px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/Claude_design_result.png" 
+      alt="Claude Design interactive prototype with Tweaks panel on the right" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+Claude Design also generated a "Tweaks" panel on the right with its own adjustment controls: which habit to preview, which screen to start on, the default chart type, and a checkbox for showing points on line charts. I didn't ask for any of that — Claude built the controls itself based on the prompt. It's a neat touch, those knobs are useful for reviewing the design rather than trying in the app.
+
+## The Handoff Package
+
+When I was happy with the design, I asked Claude to hand it off. It produced a "Handoff Package" available as a zip download. It did not launch a Claude Code session automatically; I had to download the zip and bring it over to my terminal myself.
+
+The contents of the package were reasonable:
+
+<div className="mx-auto flex w-full max-w-[350px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/claude_design_handover_package.png" 
+      alt="Contents of the Claude Design handoff zip: Analytics Screen.html, a components directory with JSX files, and a README.md" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+The zip includes a standalone HTML version of the prototype, a set of JSX component files broken down sensibly (analytics screen, utilities, chart, data, goal screen, UI primitives), and a README describing what was built and how. It's not production React Native code — OnTrack is RN with Expo, and the handoff is web — but that's not really the point. The handoff exists to give Claude Code a detailed reference of the intended behaviour, layout, and styling, not to be dropped into the project verbatim.
+
+## Handing It Off to Claude Code
+
+I opened a Claude Code session in the OnTrack repository, pointed it at the zipped handoff package, and asked it to implement the analytics screen in React Native using the existing project conventions.
+
+Claude Code did most of the work well. It ported the JSX to React Native components, wired up the analytics logic against the existing local-storage history, added a route from the goal screen, and got the screen rendering on iOS, Android, and Web. The time-period controls, the chart toggles, the averages panel — all of it came through.
+
+<div className="mx-auto flex w-full max-w-[700px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/claude_code_implementation_after_handover.png" 
+      alt="Final implementation of the analytics screen on Android, Web, iOS 18, and iOS 26 with Liquid Glass" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+The screen works across Android, the web build, iOS 18, and iOS 26 with Liquid Glass. The line chart, the target line, the Points on/off toggle, and the per-day/week/month/year averages are all behaving as designed. The screen came out of a single prompt and a zip handoff, and there was no gap between "prototype" and "actually running on four platforms".
+
+### The One Thing It Got Wrong: Light Mode
+
+There was one clear miss. The dark theme was implemented correctly and matched the prototype, but the light theme was completely broken — the card backgrounds stayed dark while the screen background turned white, and the labels under the chips disappeared into the background.
+
+<div className="mx-auto flex w-full max-w-[350px] flex-col gap-4 sm:flex-row">
+  <div className="flex-1">
+    <img 
+      src="/static/images/claude_design/implementation_broken_light_mode.png" 
+      alt="Broken light theme: dark cards on a white background, invisible labels, inconsistent bottom bar" 
+      className="h-auto w-full rounded-lg shadow-md"
+    />
+  </div>
+</div>
+
+The root cause is straightforward: the Claude Design prototype was dark-only because the source screenshots I provided were dark-only. Nothing in the handoff told Claude Code to care about both themes, and nothing in my implementation prompt reminded it either. It defaulted to hardcoding the dark values in several places rather than threading everything through the existing theme system.
+
+This is fixable at the project level rather than per-prompt. A short project rule — something like *"whenever you add or modify a screen, verify the output in both light and dark mode and use the project's theme tokens rather than hardcoded colours"* — would have caught this on the first pass. I'll add that rule to the repository, this is what [harnessing](https://martinfowler.com/articles/harness-engineering.html) is about.
+
+It is possible to pass files hosted on Github to Claude Design, however it's not possible to simply link the Github repo itself. So if I had many rules in the repo, I'd have to pass all of them. Claude Design is still in Beta, that will probably get fixed soon.
+
+## Final Thoughts
+
+Claude Design speeds up prototyping by generating interactive prorotypes wit multiple variations in minutes. The questions to refine the design options give enough control over the direction.
+
+I went from a prompt and two screenshots to an interactive prototype I could click around in, then to a working screen running on four platforms, in an afternoon.
+
+A few things I'd like to see evolve:
+* **Launch Claude Code directly from the handoff.** Downloading a zip and walking it over to a terminal works, but it's a break in the flow. A one-click "open in Claude Code" would close the loop.
+* **Better integration with Github.** It is possible to add files to the chat session, and it is possible to pick files from a Github repo. I would expect to just pass the link to the repo and it would look at my rules and skills, so it could apply the themes properly if I had set that rule.
+
+The final result will be available in the OnTrack apps fairly soon. It is already available on web at https://ontrack.aymeric.fyi.
