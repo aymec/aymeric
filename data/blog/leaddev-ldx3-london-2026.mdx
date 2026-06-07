@@ -1,0 +1,76 @@
+---
+title: 'LeadDev LDX3 London 2026 Summary'
+date: '2026-06-08'
+tags: ['AI', 'Software Engineering', 'Engineering Management']
+draft: false
+summary: What 25 talks and panels at LDX3 London 2026 said about engineering teams in the AI era.
+images: ['/static/images/ldx3-2026.jpg']
+---
+
+![LDX3 London Stage](/static/images/ldx3-2026.jpg)
+
+I went to LeadDev LDX3 in London this year with two specific questions:
+
+1. **How do teams evolve and operate in the AI era?**
+2. **How do the roles of individual contributors, engineering managers, directors and above change — and how will they?**
+
+I left with clearer answers to the second than the first. Here are the patterns that came up again and again, the talks that made them, and what I think they add up to.
+
+## 1. The real story was fundamentals, not AI
+
+If one idea dominated the conference, it was this: **AI speeds up engineers, and that turns the slightly-annoying parts of your software delivery lifecycle into hard blockers.** Developer experience is becoming *agentic* experience, and the plumbing has to keep up.
+
+**Nicole Forsgren** framed it best in "**Why developer experience is your competitive advantage**": *"You gave your teams 10x speed but your system moves at 1x."* Her speed/friction mismatch — 15-minute builds, manual approvals, undocumented decisions — is tolerable at 1x and catastrophic at 10x.
+
+**Liz Fong-Jones** shared the same lesson in "**30 to 70 PRs a day**": continuous delivery on an hourly deploy train, CI migrated from CircleCI to RWX so it runs as fast as the change is made, and platform engineering treated as the thing that stops incidents from doubling.
+
+**King-Immanuel Edoh**'s "**Building resilient engineering teams when failure is the default**" made the most memorable version of the argument — In Nigeria's context where the power grid is highly unreliable, good engineering practices are not nice-to-have's, they are mandatory. His three takeaways are pure fundamentals: kill the happy-path bias, be asynchronous by default, and trade heroes for systems (*"heroes don't scale, psychological safety does"*).
+
+**Maryia Tarpachova**'s "**Mechanics of scaling**" added the systems-thinking version: growth creates the complexity that limits further growth, AI accelerates that balancing loop, so the move is to *stop accelerating, find the constraint, and redesign around it.*
+
+And **Abi Harrison-Nye**'s "**Moving accessibility from debt to done**" at giffgaff was the talk that never mentioned AI. Building accessibility in from the start (semantic HTML, shared components) added *zero* development time; the cost was rewiring bad habits. Her line emphasized the human aspect that AI can't cover *"Automation can only catch 30% of accessibility requirements — we can't automate our way out of empathy."* Some fundamentals aren't a pipeline problem. They're a human one.
+
+## 2. The proof: the gains are real, but only if the system is ready
+
+**Justin Reock**'s "**The state of AI in software development: insights across 400+ organisations.**" shared DX's data from 435 companies and 135k developers. It shows AI is genuinely working — 90% adoption, 3.8 hours saved per week, and ramp-up for new engineers nearly halved (time to a 10th PR dropping from ~80 days to ~30).
+
+But the headline gains are modest *on average* — change confidence up only ~2%, change failure rate barely moved — and that average hides enormous variance. Company by company, it's "high highs and low lows." Reock framed it succinctly: "10x engineers don't exist, but 10x organisations do" — a ~21% performance spread between individuals, versus a ~11x spread between organisations. Productivity is constrained by the system, not the individual.
+
+Most strikingly, his data found the biggest drags on engineering output still aren't AI-related at all — they're meeting-heavy days, interruptions, and build/test wait time. That's the whole conference's thesis, in numbers: AI pays off for the organisations that already fixed their fundamentals. It also comes with a learning curve — new and light users actually see a dip in productivity while ramping; output only takes off with daily use.
+
+## 3. The gains are real — but bounded, and not free
+
+Liz Fong-Jones gave the most honest numbers among the practitioner talks. The goal was explicitly 2x, not 10x. Throughput didn't actually move until Opus 4.6 landed. And doubling PRs came with **25% more incidents** and a real platform-engineering tax. **Yiğit Darçın**'s "**AI in the trenches**" added concrete wins (regression testing cut from 3 days to 6 hours; ~28% of issues now fixed by an agent) — but only after heavy investment in metrics and platforms.
+
+The counterweight came from the "**What will AI-accelerated engineering teams actually look like?**" panel: no company has proven it does the same work with fewer engineers. Layoffs "due to AI" are usually accounting, and Jevon's paradox suggests demand rises rather than falls — OpenAI and Anthropic themeselves are hiring aggressively recently.
+
+## 4. The bottleneck moved from writing code to verifying it
+
+The "**How will we deal with the new drudgery of AI-generated code?**" panel was clear: *typing code was never the bottleneck.* Code is *"free puppies"* — easy to get, expensive to keep. Their answers provided insights at what they are trying to keep up: chaos-monkey test scripts whose results go in the PR, splitting work into small reviewable commits, refusing anything over 500 SLOC, a `dogfood.md` per module. The "AI-accelerated teams" panel agreed the constraint is now how fast you can review and define what to build — and several speakers named skill atrophy as the cost of letting the AI think for you.
+
+## 5. The leadership job stays human — that core doesn't change
+
+This is where the conference was most reassuring. The "**What makes an effective EM in the AI era?**" panel kept returning to people, routing information, and accountability. Regardless of whether AI is used or not, humans still need support. The engineering-director panel said AI won't remove organisational complexity — *problem synthesis and seeing the big picture is still required.* **Karen Lee Rigg**'s **"Up and down the management track**" insisted leadership principles don't change regardless of level. **Zoe Cunningham** urged doubling down on human-centric skills, and **Simone Casciaroli**'s "**Virtual Chief of Staff**" talk drew the line clearly: automate the system, never automate human connection. It's worth noting Reock's data agrees from a different angle — **psychological safety was the single biggest factor in team productivity** in DX's dataset.
+
+## 6. The middle is being squeezed — enter the "player-coach"
+
+**Scott Carey**'s "**Engineering Leadership in 2026**" (600 leaders surveyed) named it: The Great Flattening. Five layers collapsing toward CEO → Lead → ICs, management hit hardest in layoffs, more hands-on work and more hours at every level, and many leaders considering a move back to IC. The single most-asked audience question all conference — at the EM panel — was *what does career growth even mean under flattening?* The answer, after a long pause: expand your scope, find problems in the business, and solve them. That's the player-coach in one sentence.
+
+---
+
+## My two questions, answered
+
+**How do teams operate in the AI era?**
+
+The future *shape* of the team was left deliberately open — *"no one can predict the future"* came up more than once. But the present-tense operating model is clear: flatter orgs, roles bleeding into each other, DX extending into **AX** (agent experience), closed-loop observability that now covers agent work, async-by-default, spec-driven development — and a centre of gravity that has shifted from *producing* code to *verifying* it. And the meta-answer from Reock's data: the team that operates well in the AI era is the one that fixed its system first.
+
+**How do the roles change?**
+
+- **IC:** more parallelisation and context-switching; you go *deeper* to verify, because anyone can just generate code. Juniors are the at-risk group for *learning* and also the heaviest adopters.
+- **EM:** the core is unchanged (humans, alignment, accountability), but a player-coach expectation pulls you back toward hands-on work via AI — described, refreshingly, as motivating rather than a burden. The role is in heavy flux and varies wildly by company.
+- **Director:** depth → breadth; spotting and influencing the gaps *between* teams; leaning on a principal-engineer network — while being expected to be more in the details than before.
+- **CTO:** the five questions (people, tech, product, risk, sales — per **Dee Kitchen**'s "**What does a CTO even do?**") don't change. The squeeze is on the middle, not the top.
+
+## The takeaway
+
+The engineering leadership job isn't really changing — keep serving humans, unblock them, align stakeholders, and build confidence around the short term, because long-term strategy is nearly impossible to pin down right now. What is changing is everything around the role: faster delivery exposing weak fundamentals, a flatter org chart, and a verification bottleneck that makes craftsmanship matter more, not less. And the data underneath it all, the gap between teams that win with AI and teams that don't isn't talent, it's the system.
