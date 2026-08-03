@@ -1,0 +1,240 @@
+---
+title: 'My Claude Code Setup'
+date: '2026-08-03'
+tags: ['AI', 'Software Engineering']
+draft: false
+summary: 'I have been using Claude Code personally and professionally for about six months. This post explains how I set it up, including plugins, tools, MCPs and CLI.'
+images: ['/static/images/claude_setup.png']
+---
+
+![A simple Claude Code session](/static/images/claude_setup.png)
+
+I've used Claude Code daily for about six months, personally and at work. This is the setup I've landed on: settings, MCP servers, plugins, and the CLIs I lean on. All commands are for macOS.
+
+Things move fast in this space, so this will age quickly. I'll update it occasionally.
+
+## Installing Claude Code
+
+Instructions from [Claude Code Quickstart](https://code.claude.com/docs/en/quickstart).  
+Note that using Claude Code requires a paid subscription.
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+This is the command to run in a macOS terminal to install Claude Code's CLI.  
+To install Claude Desktop, visit [this page](https://claude.com/download).
+
+Using the recommended install method lets you update Claude Code simply by invoking `claude update`.
+
+I mostly use Claude Code CLI because I found it easier to add MCPs and Claude Code is where I spend most of my time, rather than the Chat or Cowork features.  
+I wish the CLI and Desktop app shared their configuration, but for now this is not the case.  
+
+## Claude Code Settings
+
+This section describes a few simple settings I use with Claude Code CLI.
+
+### Auto mode
+
+I enable [auto mode](https://code.claude.com/docs/en/auto-mode-config). Auto mode lets Claude Code run without routine permission prompts by routing tool calls through a classifier that blocks anything irreversible, destructive, or aimed outside your environment. It's much safer than `--dangerously-skip-permissions`.
+
+In `~/.claude/settings.json`, add the following config in `permissions`:
+```bash
+{
+  "permissions": {
+    "defaultMode": "auto"
+  }
+  ...
+}
+```
+
+### Statusline
+
+The statusline is a line of text displaying information right below the prompt input box in the Claude Code CLI.  
+I use it to display the folder Claude is currently opened in, the model in use, and the context window usage ratio.  
+There isn't an official documentation page. [This blog post](https://hannahstulberg.substack.com/p/claude-code-for-everything-your-status-line-is-empty) covers it extensively.
+For me it looks like this:
+```
+my-project | Opus 4.8 | ctx: 25%
+```
+
+The simplest way to enable the statusline is by calling the `/statusline` command from Claude Code.  
+It creates a script file in `~/.claude/statusline-command.sh`.  
+Mine looks like this:
+```bash
+#!/bin/sh
+input=$(cat)
+dir=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
+model=$(echo "$input" | jq -r '.model.display_name // empty')
+used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+
+# Bright green (color 10) for directory basename
+dir_name=$(basename "$dir")
+printf '\033[92m%s\033[0m' "$dir_name"
+
+[ -n "$model" ] && printf ' | %s' "$model"
+[ -n "$used" ] && printf ' | ctx: %.0f%%' "$used"
+```
+
+## MCP / Plugins / CLI
+
+Regarding MCPs, I always install them with the user scope so they are available across all my projects.  
+Note that this is not the default, so do not forget the `--scope user` argument when installing MCPs.
+
+About the impact of MCPs on context: when MCPs first became available in Claude Code and other AI agent tools, every MCP tool was loaded into the context at the start of a session. This is not the case anymore.
+
+Anthropic implemented the [tool-search tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) in Claude Code in December 2025 to resolve this issue.  
+Claude now loads only a few tools in the context by default at the start of a new session, e.g. read and write files, web-search, but not all the MCP-provided tools.  
+Then depending on the task at hand, Claude uses the tool-search tool to search available tools that could help with the task, and dynamically loads the relevant tools in the context.  
+
+Nowadays, enabling many MCPs in Claude Code does not bloat the context by default.  
+This is not true for all coding agents. At the time of writing in August 2026, OpenCode still loads every tool in the context at the start of a session.
+
+### Notion
+
+I use [the official Notion MCP](https://developers.notion.com/guides/mcp/get-started-with-mcp).
+```bash
+claude mcp add --scope user --transport http notion https://mcp.notion.com/mcp
+```
+
+### Linear
+
+I use [the official Linear MCP](https://linear.app/docs/mcp).
+```bash
+claude mcp add --scope user --transport http linear https://mcp.linear.com/mcp
+```
+
+### Atlassian: Jira and Confluence
+
+I use [the official Atlassian MCP](https://github.com/atlassian/atlassian-mcp-server).
+```bash
+claude mcp add --scope user --transport http atlassian https://mcp.atlassian.com/v1/mcp
+```
+
+### Google Workspace: Drive, Gmail, Calendar, Sheets, Docs, etc
+
+[The googleworkspace-cli](https://github.com/googleworkspace/cli) is not an officially supported Google product.  
+`gws` is a CLI for all of Google Workspace Drive, Gmail, Calendar, Sheets, Docs and every Workspace API.  
+It doesn't ship a static list of commands. It reads Google's own Discovery Service at runtime and builds its entire command surface dynamically. When Google Workspace adds an API endpoint or method, gws picks it up automatically.  
+
+Follow [the Quickstart](https://github.com/googleworkspace/cli#quick-start) in the README to set it up.  
+I don't use any Claude skill with it, I usually invoke it by asking Claude to "use the gws CLI to access this Doc/Sheet".
+```bash
+brew install googleworkspace-cli
+```
+
+### Slack
+
+I regularly use Slack's MCP, but it requires Slack admin access so I haven't had to set up the MCP myself. Configuring [the official Slack MCP](https://support.claude.com/en/articles/11506255-get-started-with-claude-in-slack) requires some actions in both Slack and Claude.
+
+### GitHub
+
+I use [the GitHub CLI](https://cli.github.com/) `gh`.  
+I don't use any Claude skill with it. Most of the time, Claude defaults to using it. When it doesn't, and it tries to access PRs via the web URL, I instruct it to use the `gh` command.
+```bash
+brew install gh
+```
+
+For [signed commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits), I recommend using [pinentry-mac](https://formulae.brew.sh/formula/pinentry-mac) as Claude Code CLI and the GnuPG Key passphrase entry collided in the terminal. This pinentry-mac makes the passphrase entry pop in a macOS native window. The passphrase can also be set in macOS' keychain.
+
+### Sourcegraph
+
+I use [the official Sourcegraph MCP](https://sourcegraph.com/mcp).
+```bash
+claude mcp add --scope user --transport http sourcegraph https://sourcegraph.<your domain>/.api/mcp
+```
+
+### Datadog
+
+I use [the official Datadog MCP](https://docs.datadoghq.com/mcp_server/).  
+Datadog has many tools. I enabled the core tools (logs, metrics, traces, dashboards, monitors and more) and APM. The complete list of tools is defined in [the documentation](https://docs.datadoghq.com/mcp_server/tools/).  
+```bash
+claude mcp add --scope user --transport http datadog "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp?toolsets=core,apm"
+```
+
+### BigQuery CLI
+
+I use the `bq` CLI from [the Google Cloud Platform SDK CLI](https://docs.cloud.google.com/sdk/docs/install-sdk).  
+1. Install Google Cloud CLI
+```bash
+brew update && brew install --cask gcloud-cli
+```
+2. Authenticate
+```bash
+gcloud auth application-default login
+```
+
+### Chrome DevTools
+
+I use [the official Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp).
+```bash
+claude mcp add --scope user chrome-devtools -- npx chrome-devtools-mcp@latest
+```
+
+This MCP has been especially useful to run one-off tests on a web product, for instance testing a specific user flow, or run specific search queries on a web product and estimate relevance.  
+It also provides a good accessibility audit tool.
+
+### Playwright
+
+I use [the official Playwright MCP](https://playwright.dev/docs/getting-started-mcp).  
+I haven't used it much and I use mostly the Chrome DevTools MCP.
+```bash
+claude mcp add --scope user playwright -- npx @playwright/mcp@latest
+```
+
+### Xcode
+
+I use [Sentry's XcodeBuild MCP](https://github.com/getsentry/XcodeBuildMCP).  
+This enables the agent to interact with the iOS simulator when developing mobile apps.
+```bash
+brew tap getsentry/xcodebuildmcp
+brew install xcodebuildmcp
+claude mcp add --scope user XcodeBuildMCP -- npx -y xcodebuildmcp@latest mcp
+```
+
+### Android
+
+I use [the official Android CLI](https://developer.android.com/tools/agents/android-cli).  
+This enables the agent to interact with the Android emulator when developing mobile apps.
+1. Download and install the CLI
+```bash
+curl -fsSL https://dl.google.com/android/cli/latest/darwin_arm64/install.sh | bash 
+```
+2. Initialize it
+```bash
+android init
+```
+
+### Figma
+
+I use [the official Figma plugin](https://help.figma.com/hc/en-us/articles/39888612464151-Claude-Code-and-Figma-Set-up-the-MCP-server) from Claude's plugin marketplace.
+```bash
+claude plugin install figma@claude-plugins-official
+```
+
+### LSPs (Language Server Protocol)
+
+A Language Server is meant to provide the language-specific smarts and communicate with development tools to provide features like auto complete, go to definition, or documentation, without having to learn each development tool interface.  
+They can be installed from Claude's plugin marketplace.
+Here are a few popular ones for the languages I use:
+```bash
+# Golang
+claude plugin install gopls-lsp@claude-plugins-official
+# TypeScript
+claude plugin install typescript-lsp@claude-plugins-official
+# Swift
+claude plugin install swift-lsp@claude-plugins-official
+# Kotlin
+claude plugin install kotlin-lsp@claude-plugins-official
+```
+
+### Obra/Superpowers
+
+Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.  
+Superpowers kicks in automatically to create detailed plans during coding sessions.  
+I used it for a while and it gave great results. I recently disabled it to test vanilla Anthropic models at various effort levels.  
+I install it from Claude's plugin marketplace.
+```bash
+claude plugin install superpowers@claude-plugins-official
+```
+
