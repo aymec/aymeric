@@ -1,17 +1,43 @@
 ---
 title: 'My Claude Code Setup'
-date: '2026-08-03'
+date: '2026-08-05'
 tags: ['AI', 'Software Engineering']
 draft: false
 summary: 'I have been using Claude Code personally and professionally for about six months. This post explains how I set it up, including plugins, tools, MCPs and CLI.'
-images: ['/static/images/claude_setup.png']
+images: ['/static/images/claude_code_setup/claude_setup.png']
 ---
 
-![A simple Claude Code session](/static/images/claude_setup.png)
+![A simple Claude Code session](/static/images/claude_code_setup/claude_setup.png)
 
-I've used Claude Code daily for about six months, personally and at work. This is the setup I've landed on: settings, MCP servers, plugins, and the CLIs I lean on. All commands are for macOS.
+I've used Claude Code daily for over six months, professionally and personally. This is the setup I've landed on: settings, MCP servers, plugins, and the CLIs I lean on. All commands are for macOS.
 
 Things move fast in this space, so this will age quickly. I'll update it occasionally.
+
+## Table of Contents
+
+- [Installing Claude Code](#installing-claude-code)
+- [Claude Code Settings](#claude-code-settings)
+  - [Auto mode](#auto-mode)
+  - [Statusline](#statusline)
+  - [Subagents](#subagents)
+- [Models and Effort Levels](#models-and-effort-levels)
+- [MCP / Plugins / CLI](#mcp--plugins--cli)
+  - [Notion](#notion)
+  - [Linear](#linear)
+  - [Atlassian: Jira and Confluence](#atlassian-jira-and-confluence)
+  - [Google Workspace: Drive, Gmail, Calendar, Sheets, Docs, etc](#google-workspace-drive-gmail-calendar-sheets-docs-etc)
+  - [Slack](#slack)
+  - [GitHub](#github)
+  - [Sourcegraph](#sourcegraph)
+  - [Datadog](#datadog)
+  - [BigQuery CLI](#bigquery-cli)
+  - [Chrome DevTools](#chrome-devtools)
+  - [Playwright](#playwright)
+  - [Xcode](#xcode)
+  - [Android](#android)
+  - [Figma](#figma)
+  - [LSPs (Language Server Protocol)](#lsps-language-server-protocol)
+  - [Obra/Superpowers](#obrasuperpowers)
 
 ## Installing Claude Code
 
@@ -32,7 +58,8 @@ I wish the CLI and Desktop app shared their configuration, but for now this is n
 
 ## Claude Code Settings
 
-This section describes a few simple settings I use with Claude Code CLI.
+This section describes a few simple settings I use with Claude Code CLI.  
+All settings are documented in [Claude Code Environment Variables](https://code.claude.com/docs/en/env-vars).
 
 ### Auto mode
 
@@ -43,7 +70,7 @@ In `~/.claude/settings.json`, add the following config in `permissions`:
 {
   "permissions": {
     "defaultMode": "auto"
-  }
+  },
   ...
 }
 ```
@@ -75,6 +102,37 @@ printf '\033[92m%s\033[0m' "$dir_name"
 [ -n "$model" ] && printf ' | %s' "$model"
 [ -n "$used" ] && printf ' | ctx: %.0f%%' "$used"
 ```
+
+### Subagents
+
+I mostly default to Opus as my main model, and I set Sonnet as the subagent model.  
+My hypothesis is that Opus specifies the tasks well enough for the cheaper model to do the task well.  
+So far it works well.  
+Hopefully Anthropic model routing will improve to the point that this won't be necessary.  
+
+```bash
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  },
+  ...
+}
+```
+
+## Models and Effort Levels
+
+New models get released frequently, and I use new releases from either class of model to experiment with the new model and compared to the previous model and effort I used at that point.  
+I test it by doing ny usual work for a few days with the new configuration and feeling how much faster or slower it does compared to the previous setting.  
+
+Recently, I started referring to [DeepSWE](https://deepswe.datacurve.ai/) that provides a common benchmark of frontier labs models at various effort levels, providing both a score and cost per task.  
+The cost per task is particularly interesting. A cheaper cost-per-token model may keep iterating to fix its own issues, spending multiple times more tokens than a higher cost-per-token model getting it right the first time.  
+
+Filtering the results on recent Anthropic models at verious effort levels, Opus 5 at Low effort level gets a good score at the cheapest cost per task of all models and effort levels.  
+Opus 5 at Low effort performs on par with Opus 4.8 at Max effort, at 1/8th the cost per task.  
+It perfoms better than Sonnet 5 at Max effort level, at 1/16th the cost per task.  
+So I default to Opus 5 at Low effort for most of my work.  
+
+![DeepSWE Benchmark showing benchmark scores and price per task for Anthropic models at different effort levels](/static/images/claude_code_setup/deepswe_anthropic_models.png)
 
 ## MCP / Plugins / CLI
 
