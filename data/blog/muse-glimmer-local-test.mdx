@@ -1,0 +1,83 @@
+---
+title: "Meta's Muse Glimmer: A for Effort, Too Slow to Use Locally"
+date: '2026-08-11'
+tags: ['AI']
+draft: false
+summary: "I compared Meta's new Muse Glimmer 30B against Gemma4 26B-A4B and Qwen3.6 35B-A3B on a simple agentic search task, running locally on an M3 Max. Muse Glimmer tries harder than any of them, and that is exactly what makes it unusable."
+images: ['/static/images/muse-glimmer-local-test/muse-glimmer.webp']
+---
+
+![Meta's new open-source model: Muse Glimmer](/static/images/muse-glimmer-local-test/muse-glimmer.webp)
+
+[Meta released Muse Glimmer 30B on August 10th](https://research.meta.ai/blog/introducing-muse-glimmer-open-agentic-model), a new open-source and open-weights model aimed at local deployment.  
+I gave it a small agentic task and compared it with two models I already run locally.
+
+## The setup
+
+I used [Ollama](https://ollama.com) and [OpenCode](https://opencode.ai), with the MLX version of each model, on an M3 Max with 96GB of RAM.
+
+Ollama's MLX support leverages Apple silicon, as described in [their blog post](https://ollama.com/blog/mlx-performance).  
+Muse Glimmer's [`30b-mlx`](https://ollama.com/library/muse-glimmer) model supports DFlash, the speculative decoding scheme Meta credits for a 1.5x to 1.8x speedup on Apple silicon.
+
+The three contenders:
+
+- Muse Glimmer 30B
+- Gemma4 26B-A4B
+- Qwen3.6 35B-A3B
+
+The task was to find the knowledge cutoff date of Muse Glimmer 30B.  
+It is a deliberately simple question, but the answer is only available on the [HuggingFace model card](https://huggingface.co/meta-models/Muse-Glimmer-30B), published after every one of these models' own training cutoffs, so none of them can answer from memory. They have to make tool calls and actually go find it.  
+Muse Glimmer's knowledge cutoff date is January 4th, 2026, according to the model card.
+
+## Muse Glimmer 30B
+
+Muse Glimmer needed over 28 minutes, working through a long list of pages trying to find the information.
+
+![Muse Glimmer took 28 minutes to NOT find the answer](/static/images/muse-glimmer-local-test/muse-glimmer-2.png)
+
+The good part is that Muse Glimmer tried hard. It generated a longer list of credible URLs to go through than any other model in the test. It simply never landed on the right one.
+
+![Muse Glimmer Tries Hard](/static/images/muse-glimmer-local-test/muse-glimmer-1.png)
+
+The problem is that it runs at 20 tokens per second. Trying hard is exactly what makes it unusable: it slowly crawls through everything it pulled.  
+Even after I handed it the URL with the answer, it needed another 22 minutes to extract the date.
+
+![Muse Glimmer needed 22 minutes to read the answer from the page once given the URL](/static/images/muse-glimmer-local-test/muse-glimmer-3.png)
+
+## Qwen3.6 35B-A3B
+
+Qwen3.6 found the answer in a minute and a half, after a small nudge, without being handed the URL.
+
+![Qwen3.6 tried and failed initially, in under two minutes](/static/images/muse-glimmer-local-test/qwen-3.6-35B-A3B-1.png)
+
+![Qwen3.6 found the answer in a minute and a half after a small nudge](/static/images/muse-glimmer-local-test/qwen-3.6-35B-A3B-2.png)
+
+It runs at around 70 tokens per second on the M3 Max.  
+For comparison, the Qwen3.6 27B dense model averages 15 tokens per second.
+
+## Gemma4 26B-A4B
+
+Gemma4 looked through several sources in a couple of minutes but could not find the information.
+
+![Gemma4 tried and failed initially, in under two minutes](/static/images/muse-glimmer-local-test/gemma4-26B-A4B-1.png)
+
+When nudged, it went off the rails.
+
+![Gemma4 goes off the rails](/static/images/muse-glimmer-local-test/gemma4-26B-A4B-2.png)
+
+Gemma4 extracted the right answer in a minute and a half when given the URL.
+
+![Gemma4 found the answer in a minute and a half when given the URL](/static/images/muse-glimmer-local-test/gemma4-26B-A4B-3.png)
+
+It runs at around 60 tokens per second on the M3 Max.  
+For comparison, the Gemma4 31B dense model averages 22 tokens per second.
+
+## Conclusion
+
+Muse Glimmer uses a dense architecture that performs on par with the dense model versions of Qwen3.6 and Gemma4.  
+This results in models that are too slow for local agentic workflows, unless one owns the most recent MacBook Pro M5 Max with 64GB of memory, a \$5,000 device before taxes.  
+Qwen3.6 35B-A3B and Gemma4 26B-A4B use Mixture of Experts (MoE), running faster than their dense versions. This makes these MoE models better suited for local agentic workflows, the precise use case Meta targets, according to their blog post.  
+
+One last thing: Muse Glimmer only supports 128k context length, compared with 256k for the other two models.  
+
+I appreciate Meta's attempt at creating an alternative to the existing open-source and open-weights models. It will need an MoE if it wants to rival competitors' models.
