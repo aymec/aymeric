@@ -1,0 +1,142 @@
+---
+title: "Qwen3.8 27B: A Free and Slow Sonnet 5?"
+date: '2026-08-15'
+tags: ['AI']
+draft: false
+summary: "Qwen3.8 27B just got released, a week after Meta's Muse Glimmer 30B. Alibaba advertises benchmark scores on par with Opus 4.6. This post compares Qwen3.8 27B with Muse Glimmer 30B, Sonnet 5 and Opus 5."
+images: ['/static/images/qwen3-8-27B-local-test/qwen3.8_live.png']
+---
+
+![Qwen3.8 27B is Live](/static/images/qwen3-8-27B-local-test/qwen3.8_live.png)
+
+## The setup
+
+I used [Ollama](https://ollama.com) and [OpenCode](https://opencode.ai), with the MLX version of each open model, on an M3 Max with 96GB of RAM.  
+Opus and Sonnet were used with Claude Code CLI.
+
+The contenders:
+
+- Opus 5 in Low effort
+- Sonnet 5 at High and Low effort
+- Muse Glimmer 30B
+- Qwen3.6 35B-A3B
+- Qwen3.8 27B at Medium and XHigh effort
+
+With six models and several effort levels each, testing every combination wasn't practical. I picked the efforts I thought would compare best with Qwen3.8 27B. And for Qwen, I tried two of the three levels, Medium and XHigh, leaving only Low untested.
+
+Ollama's MLX support leverages Apple silicon, as described in [their blog post](https://ollama.com/blog/mlx-performance).  
+[Qwen3.8 27B](https://ollama.com/library/qwen3.8) supports MTP, Multi-Token Prediction, an architectural and training technique where the model predicts multiple future words or tokens simultaneously rather than just guessing the single next token.  
+Muse Glimmer's [`30b-mlx`](https://ollama.com/library/muse-glimmer) model supports DFlash, the speculative decoding scheme Meta credits for a 1.5x to 1.8x speedup on Apple silicon.
+
+The task was to build a single level of the NES Super Mario Bros game.  
+The prompt was the same for every model:
+```none
+Create a single level of the mario bros video game in the style of the original NES, that I can run locally in my browser.
+```
+
+## Opus 5
+
+For this task, Opus 5 was set with Low effort.  
+It produced the best result by far and is the benchmark for the rest of this article.  
+Everything looked good, the game could be played easily, every element was where it was supposed to be, the movements made sense and it even included the music that sounded just like the original.  
+
+![The Mario Bros game by Opus 5. Mario faces a goomba, with graphics looking close to the original game.](/static/images/qwen3-8-27B-local-test/opus5_mario_screenshot1.png)
+![The Mario Bros game by Opus 5, level finished, with the castle and the final score.](/static/images/qwen3-8-27B-local-test/opus5_mario_screenshot2.png)
+
+Opus 5 "cogitated" for 13m 46s.
+
+![Opus 5 built the game in 13m 46s.](/static/images/qwen3-8-27B-local-test/opus5_mario_output.png)
+
+
+## Sonnet 5 High Effort
+
+With Sonnet 5 in High effort, the game was completely playable, and everything was where it was supposed to be. Only the graphics were clearly not as polished as with Opus 5.  
+
+![The Mario Bros game by Sonnet 5 High effort. Mario faces a goomba, with graphics simplified compared to Opus 5](/static/images/qwen3-8-27B-local-test/sonnet5_high_mario_screenshot1.png)
+
+It took Sonnet 5 with High effort 12m 45s to produce this game.
+
+![Sonnet 5 in High effort worked for 12m 45s.](/static/images/qwen3-8-27B-local-test/sonnet5_high_mario_output.png)
+
+## Sonnet 5 Low Effort
+
+With Sonnet 5 in Low effort, the game was playable, but the graphics were simpler and they had elements clearly out of place, such as Mario floating in the air when he should fall into the gaps.  
+
+![The Mario Bros game by Sonnet 5 Low effort. Mario floats in the air where there is no floor.](/static/images/qwen3-8-27B-local-test/sonnet5_low_mario_screenshot1.png)
+
+Sonnet 5 with Low effort quickly built the game, the fastest of all models compared in this article, in 3m 4s.
+
+![Sonnet 5 in Low effort worked fast, in 3m 4s.](/static/images/qwen3-8-27B-local-test/sonnet5_low_mario_output.png)
+
+## Muse Glimmer 30B
+
+Muse Glimmer, in its default High reasoning effort, in NVFP4 quantization, produced a game without the Mario character, and without a floor. The level progressed by pressing the right arrow key.  
+The result was clearly disappointing considering the model was in High effort and therefore supposed to be at its best.  
+
+![The Mario Bros game by Muse Glimmer has no Mario character and no floor.](/static/images/qwen3-8-27B-local-test/muse_glimmer_mario_screenshot1.png)
+
+At 20 tokens per second, it was the slowest in raw output in this test, but it only took Muse Glimmer 11m 38s to produce this masterpiece.  
+
+![Muse Glimmer worked reasonably fast, in 11m 38s.](/static/images/qwen3-8-27B-local-test/muse_glimmer_mario_output.png)
+
+## Qwen3.6 35B-A3B
+
+Qwen3.6 35B-A3B produced a game with a character that did not resemble Mario, and the game had a floor. The graphics were extremely simple. But the game was not playable. Mario jumped up and down on his own, and pressing any key had no effect: Mario never moved forward or backward.  
+At 70 tokens per second, Qwen3.6 35B-A3B worked relatively fast for a local model.  
+
+![The Mario Bros game by Qwen3.6 35B-A3B had a Mario character and a floor, but it didn't move.](/static/images/qwen3-8-27B-local-test/qwen3.6-35b_mario_screenshot1.png)
+
+Qwen3.6 35B-A3B worked for over an hour on this non-playable game.  
+
+![Qwen3.6 35B-A3B worked for 1h 10m.](/static/images/qwen3-8-27B-local-test/qwen3.6-35b_mario_output.png)
+
+## Qwen3.8 27B
+
+Qwen3.8 27B is the latest model from Alibaba Cloud. Their team advertises Qwen3.8 27B as producing work on par with Opus 4.6 Max effort, a frontier model only six months old.  
+
+![Qwen3.8 27B achieves coding benchmark scores on par with Opus 4.6.](/static/images/qwen3-8-27B-local-test/qwen3.8_benchmark_comparisons.png)
+
+The 27b-mlx Ollama model is the NVFP4 quantization of Qwen3.8 27B.  
+Qwen3.8 27B ran at 32 tokens per second on the M3 Max. This is 50% faster than dense models such as Muse Glimmer 30B or Qwen3.6 27B (the latter not tested in this post).  
+Qwen3.8 27B comes with three reasoning effort levels, Low, Medium and XHigh. Medium and XHigh are tested below.  
+
+### Qwen3.8 27B Medium Effort
+
+In Medium reasoning effort, the game had a recognizable Mario character, a floor, and goombas. The graphics were fairly simple but looked appropriate at the start. As the game progressed, elements fell out of place. Warp pipes appeared and disappeared from the screen, the floor disappeared, and Mario would get blocked by, or stand on, the invisible warp tubes.  
+
+![The Mario Bros game by Qwen3.8 27B. The first screen looked simple but reasonably good.](/static/images/qwen3-8-27B-local-test/qwen3.8-27b_mario_screenshot1.png)
+![The Mario Bros game by Qwen3.8 27B. Mario stands on an invisible warp pipe.](/static/images/qwen3-8-27B-local-test/qwen3.8-27b_mario_screenshot2.png)
+
+Qwen3.8 27B in Medium effort worked for **over two hours**.
+
+![Qwen3.8 27B worked for 2h 20m.](/static/images/qwen3-8-27B-local-test/qwen3.8-27b_mario_output.png)
+
+### Qwen3.8 27B XHigh Effort
+
+In XHigh reasoning effort, the game's graphics looked similar to those in Medium effort.  
+This time, every element stayed where it was supposed to be, and Mario didn't get stuck on invisible pipes.  
+The game level was fully playable.
+
+![The Mario Bros game by Qwen3.8 27B. The graphic elements stay consistent and the game is playable.](/static/images/qwen3-8-27B-local-test/qwen3.8-27b_xhigh_mario_screenshot1.png)
+
+Qwen3.8 27B in XHigh effort worked for exactly one hour, half the time it took in Medium effort, to produce a better result.
+
+![Qwen3.8 27B in XHigh effort worked for 1h 0m.](/static/images/qwen3-8-27B-local-test/qwen3.8-27b_xhigh_mario_output.png)
+
+
+## Conclusion
+
+Across the seven runs:
+
+| Model | Effort | Time | Result |
+| --- | --- | --- | --- |
+| Opus 5 | Low | 13m 46s | Fully playable, polished graphics, music |
+| Sonnet 5 | High | 12m 45s | Fully playable, simpler graphics |
+| Sonnet 5 | Low | 3m 4s | Playable, elements out of place |
+| Muse Glimmer 30B | High | 11m 38s | No Mario, no floor |
+| Qwen3.6 35B-A3B | Default | 1h 10m | Not playable, no input response |
+| Qwen3.8 27B | Medium | 2h 20m | Playable, elements drift out of place |
+| Qwen3.8 27B | XHigh | 1h 0m | Fully playable, simpler graphics |
+
+Qwen3.8 27B's quality seems more on par with Sonnet 5 than with the Opus 4.6 Alibaba advertises, but it works at a slower pace. The higher reasoning effort level produced better results at a faster pace.  
+For a model running locally, my impression is that it achieves better results than any local model I tested previously. On simpler tasks, it finished in times similar to Qwen3.6 35B-A3B. Depending on the coding task, Qwen3.8 27B might be a viable option when running in the background.
