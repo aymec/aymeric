@@ -30,8 +30,8 @@ export default function Home({ posts }) {
               const linkHref = isExternal ? url : `/blog/${slug}`
               return (
                 <li key={slug} className="py-1 xl:col-span-3 xl:grid xl:grid-cols-3 xl:gap-x-8">
-                  <article className="flex flex-col space-y-0.5 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 xl:col-span-3 xl:grid xl:grid-cols-3 xl:gap-x-8">
-                    <div className="w-full sm:flex-shrink-0 xl:col-span-1 xl:text-right">
+                  <article className="flex flex-col space-y-0.5 xl:col-span-3 xl:grid xl:grid-cols-3 xl:items-center xl:gap-x-8 xl:space-y-0">
+                    <div className="w-full xl:col-span-1 xl:text-right">
                       <time
                         dateTime={date}
                         className="text-l leading-6 font-medium text-gray-500 dark:text-gray-400"
@@ -39,7 +39,7 @@ export default function Home({ posts }) {
                         {formatDate(date, siteMetadata.locale)}
                       </time>
                     </div>
-                    <div className="flex-1 xl:col-span-2">
+                    <div className="w-full xl:col-span-2">
                       <h2 className="text-l leading-8 font-bold tracking-tight">
                         <Link
                           href={linkHref}
