@@ -30,7 +30,7 @@ export default function Home({ posts }) {
               const linkHref = isExternal ? url : `/blog/${slug}`
               return (
                 <li key={slug} className="py-1 xl:col-span-3 xl:grid xl:grid-cols-3 xl:gap-x-8">
-                  <article className="flex flex-col space-y-0.5 xl:col-span-3 xl:grid xl:grid-cols-3 xl:items-center xl:gap-x-8 xl:space-y-0">
+                  <article className="flex flex-col space-y-0.5 xl:col-span-3 xl:grid xl:grid-cols-3 xl:items-center xl:space-y-0 xl:gap-x-8">
                     <div className="w-full xl:col-span-1 xl:text-right">
                       <time
                         dateTime={date}
