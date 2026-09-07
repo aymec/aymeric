@@ -1,0 +1,127 @@
+---
+title: "Introduction to Counting Tokens, Prompt Caching, and Session Analytics Tools"
+date: '2026-09-06'
+tags: ['AI']
+draft: false
+summary: "Someone recently asked me how many tokens I used after my Qwen 3.8 27B experiment. I had no idea, nor did I know how to verify it. This post explains how to count tokens, how prompt caching works, and tools to help analyze sessions."
+images: ['/static/images/counting_tokens/patchwork.png']
+---
+
+![A patchwork of three tools to help with token counting](/static/images/counting_tokens/patchwork.png)  
+
+Someone asked me how many tokens I used after [my last experiment comparing Qwen 3.8 27B, Opus, and other models](/blog/qwen3-8-27b-local-test). I had no idea, nor did I know how to verify it.  
+As I used both Claude Code and OpenCode, it was even harder to verify and compare.  
+This post explains how to count tokens across various tools, how prompt caching works, and tools to help analyze sessions.  
+Depending on the provider, prompt caching is also known as context caching or prefix caching. Prompt caching is used in the rest of the article.  
+
+## Table of Contents
+
+- [Counting Tokens and Prompt Caching](#counting-tokens-and-prompt-caching)
+- [Built-in tooling in Claude Code and OpenCode](#built-in-tooling-in-claude-code-and-opencode)
+- [Token Monitor](#token-monitor)
+- [ccusage](#ccusage)
+- [AgentsView](#agentsview)
+- [Conclusion](#conclusion)
+
+## Counting Tokens and Prompt Caching
+
+Large Language Models have no memory or state. When chatting with the model, the whole history of the conversation is sent to the model on every turn. The entire conversation history becomes input tokens, and the model's responses are the output tokens.  
+When Claude Code or OpenCode makes a tool call, the tools' output is sent as a message to the model. This is more input tokens.  
+
+The first turn is special. It includes the agent harness's system prompt, the project's context, which is the AGENTS.md and other rules of the project the session started in, and the user's first message.  
+On every subsequent turn, the previous turn's response and the new message are sent.  
+
+![Three turns in a conversation with the LLM, showing that the entire conversation history is sent on every turn.](/static/images/counting_tokens/prompt-cache-diagram1.png)  
+
+The diagram above and the following ones are adapted from the diagram in [Anthropic's _How Claude Code uses prompt caching_](https://code.claude.com/docs/en/prompt-caching) page.  
+
+To optimize processing time and cost, all major AI labs implement prompt caching.  
+Previous turns are cached server-side. New turns [get routed to specific servers based on cache location](https://developers.openai.com/api/docs/guides/prompt-caching#cache-location) to optimize cache hits.  
+Cache writes get billed on top of input tokens, and cached turns get billed at a 90% discount by both [Anthropic](https://platform.claude.com/docs/en/about-claude/pricing) and [OpenAI](https://developers.openai.com/api/docs/pricing).  
+The more turns a session has, the more cost-efficient prompt caching is.  
+
+Anthropic and OpenAI call these input tokens "cache writes", and turns read from the cache are called "cache reads".  
+
+Local inference engines such as Ollama, llama.cpp, and vLLM implement Key-Value caches to reuse across turns. However, the tokens are still called input and output tokens, as illustrated in the ccusage screenshot further down.  
+
+![Three turns in a conversation with the LLM, showing cache writes and reads.](/static/images/counting_tokens/prompt-cache-diagram2.png)  
+
+The cache expires after a TTL that varies based on the provider and plan. In the case of Anthropic, the cache is either five minutes or one hour.  
+Staying away from an idle session for too long leads to cache expiration and higher costs.  
+
+Additionally, several events can lead to cache misses. The most common ones are changing the model, the effort level, turning on fast mode, and adding MCP servers.  
+
+![Four turns in a conversation with the LLM, showing cache writes, cache reads and a cache miss at the fourth turn.](/static/images/counting_tokens/prompt-cache-diagram3.png)  
+
+For more details, read the articles from the model providers, [this page for Anthropic](https://code.claude.com/docs/en/prompt-caching), and [this page for OpenAI](https://developers.openai.com/api/docs/guides/prompt-caching).  
+
+## Built-in tooling in Claude Code and OpenCode
+
+Claude Code provides the `/usage` command in any open session to review token usage.  
+It includes input tokens, output tokens, cache writes and reads. The data is split per model when using subagents.  
+
+![Typing `/usage` in an open Claude Code session displays the token consumption split per model used in the session.](/static/images/counting_tokens/claude_code_session_usage.png)  
+
+Claude Code doesn't provide a way to review token usage outside of a session. The Claude desktop app is also fairly limited in that regard.  
+
+OpenCode doesn't provide any local command or tool to review token usage.  
+
+Reviewing token usage across sessions and across different agent harnesses is possible using third-party tools. The rest of the article presents a few I tried, with their pros and cons.  
+
+## Token Monitor
+
+[Token Monitor](https://github.com/Javis603/token-monitor) is a local-first desktop widget for tracking token usage, costs, and limits across 35+ AI coding tools—including Claude Code, Codex, Cursor, OpenCode, and more.  
+
+Token Monitor displays a total number of tokens used over a period, without specifying input, output, cache writes and reads. The period can be picked from only three choices: the current day, the current month and the total.  
+
+![Token Monitor's Landing Screen displaying a total number of tokens across sessions, a github-like activity graph, and split per model.](/static/images/counting_tokens/tokenmonitor1.png)  
+
+The list of sessions doesn't display any title, only the model(s) used, the date, the number of tokens used and the equivalent cost.  
+
+![Token Monitor can display the list of sessions over a period of time.](/static/images/counting_tokens/tokenmonitor2.png)  
+
+Finally, the level of detail for a given session is limited. It contains the start of the initial input prompt. Every turn after that is present without the details of the message or response, only the input and output prompts.  
+
+![The details provided by Token Monitor for a given session are limited.](/static/images/counting_tokens/tokenmonitor3.png)  
+
+Token Monitor is too limited to be useful.  
+
+## ccusage
+
+[ccusage](https://github.com/ccusage/ccusage) is a fast local CLI for tracking tokens and estimated costs across Claude Code, Codex, OpenCode and many more agent harnesses.  
+
+ccusage is easy to use. The reports include input and output tokens, cache writes and reads, models, and cost. It does not provide any other insights into sessions.  
+It is the best tool of the three to compare token usage across sessions easily, thanks to having the simplest interface and reporting.  
+
+![ccusage has the simplest reporting, a clean table with a row per-session.](/static/images/counting_tokens/ccusage.png)  
+
+## AgentsView
+
+[AgentsView](https://github.com/kenn-io/agentsview) is a local-first, browser-based, session and token usage analytics tool for coding agents, supporting Claude Code, Codex, and more than 20 other agents.  
+It is the most complete session analytics tool presented in this article.  
+
+The main view shows statistics from all the sessions, the list of sessions, a search bar to find specific sessions, and several kinds of filters.  
+
+![AgentsView is a local, browser-based, session analytics tool.](/static/images/counting_tokens/agentsview1.png)  
+
+For each session, AgentsView displays the input and output tokens, the entire session's turns, the tool calls, and the time split per turn or per tool call.  
+The cache writes and reads are unfortunately missing.  
+
+![AgentsView session details are fairly complete.](/static/images/counting_tokens/agentsview2.png)  
+
+Further down, the main view displays aggregated stats and averaged session health scores. It also displays the score and stats split per model, agent harness, and project. The view lacks enough detail to be useful.  
+
+![AgentsView Session Health Quality provides aggregated scores but lacks details.](/static/images/counting_tokens/agentsview3.png)  
+
+A "Quality" view displays more details of the aggregated session quality score, providing recommendations for improvement based on static rules and how often the patterns were observed.  
+The intent behind the session quality score is good, but the analyses lack details and clear actionable insights to be useful. I'm hoping this quality analysis gets polished to become useful to improve prompting and the projects' harnesses.  
+
+![AgentsView Session Quality view provides a little more detail about the aggregated session score, and simple recommendations.](/static/images/counting_tokens/agentsview4.png)  
+
+## Conclusion
+
+LLMs give the impression of following a conversation by processing the entire conversation history on every turn.  
+Model providers implemented prompt caching to optimize performance and cost, drastically discounting tokens read from the cache. Coming back to a session before the cache expires is the biggest lever to optimize session costs. A few simple rules help too, like not changing a model mid-conversation.  
+
+To investigate token usage, the simplest tool is ccusage. It provides the simplest report on token inputs and outputs, and on cache writes and reads.  
+For in-depth session analytics, AgentsView is the most complete tool. Its main flaw is not displaying cache writes and reads.  
